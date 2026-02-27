@@ -91,16 +91,16 @@ class FontManager:
         """Initialize font objects"""
         try:
             # Try to use modern system fonts
-            self.title_font = font.Font(family="Segoe UI", size=13, weight="bold")
-            self.normal_font = font.Font(family="Segoe UI", size=12)
-            self.mono_font = font.Font(family="Consolas", size=11)
-            self.button_font = font.Font(family="Segoe UI", size=12, weight="bold")
+            self.title_font = font.Font(family="Segoe UI", size=11, weight="bold")
+            self.normal_font = font.Font(family="Segoe UI", size=12)  # Increased from 10
+            self.mono_font = font.Font(family="Consolas", size=11)    # Increased from 9
+            self.button_font = font.Font(family="Segoe UI", size=10, weight="bold")
         except:
             # Fallback to default fonts
-            self.title_font = font.Font(size=12, weight="bold")
-            self.normal_font = font.Font(size=12)
-            self.mono_font = font.Font(family="Courier", size=11)
-            self.button_font = font.Font(size=12, weight="bold")
+            self.title_font = font.Font(size=11, weight="bold")
+            self.normal_font = font.Font(size=12)  # Increased from 10
+            self.mono_font = font.Font(family="Courier", size=11)  # Increased from 9
+            self.button_font = font.Font(size=10, weight="bold")
     
     def get_bold_font(self):
         """Get bold version of normal font"""

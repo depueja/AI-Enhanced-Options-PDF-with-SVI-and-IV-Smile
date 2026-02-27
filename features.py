@@ -225,7 +225,7 @@ class FontSizeController:
     
     def __init__(self, font_manager):
         self.fonts = font_manager
-        self.base_size = 10
+        self.base_size = 12  # Updated to match new default
     
     def increase_size(self):
         """Increase all font sizes"""
@@ -240,16 +240,16 @@ class FontSizeController:
     
     def reset_size(self):
         """Reset to default font size"""
-        self.base_size = 10
+        self.base_size = 12  # Updated to match new default
         self._update_fonts()
     
     def _update_fonts(self):
         """Update all font objects"""
         try:
-            self.fonts.title_font.configure(size=self.base_size + 1)
+            self.fonts.title_font.configure(size=self.base_size - 1)  # Title stays smaller
             self.fonts.normal_font.configure(size=self.base_size)
             self.fonts.mono_font.configure(size=self.base_size - 1)
-            self.fonts.button_font.configure(size=self.base_size)
+            self.fonts.button_font.configure(size=self.base_size - 2)  # Buttons stay smaller
         except:
             pass
 
@@ -269,12 +269,16 @@ class FeatureMenu:
         self.font_controller = FontSizeController(app.fonts)
         
         self.create_menus()
+        self.bind_shortcuts()
     
     def create_menus(self):
         """Create all menu items"""
+        # Configure menu font size
+        menu_font = ('Segoe UI', 11)  # Increased from default
+        
         # File menu
-        file_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="File", menu=file_menu)
+        file_menu = tk.Menu(self.menubar, tearoff=0, font=menu_font)
+        self.menubar.add_cascade(label="File", menu=file_menu, font=menu_font)
         file_menu.add_command(label="Export Plot as PNG", 
                             command=self.export_png)
         file_menu.add_command(label="Export Plot as PDF", 
@@ -285,8 +289,8 @@ class FeatureMenu:
         file_menu.add_command(label="Quit", command=self.app.safe_quit)
         
         # View menu
-        view_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="View", menu=view_menu)
+        view_menu = tk.Menu(self.menubar, tearoff=0, font=menu_font)
+        self.menubar.add_cascade(label="View", menu=view_menu, font=menu_font)
         view_menu.add_command(label="Toggle Dark/Light Mode", 
                             command=self.theme_switcher.toggle_theme)
         view_menu.add_separator()
@@ -298,8 +302,8 @@ class FeatureMenu:
                             command=self.font_controller.reset_size)
         
         # Help menu
-        help_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Help", menu=help_menu)
+        help_menu = tk.Menu(self.menubar, tearoff=0, font=menu_font)
+        self.menubar.add_cascade(label="Help", menu=help_menu, font=menu_font)
         help_menu.add_command(label="About", command=self.show_about)
         help_menu.add_command(label="Keyboard Shortcuts", 
                             command=self.show_shortcuts)
@@ -334,14 +338,16 @@ class FeatureMenu:
     def increase_font(self):
         """Increase font size"""
         self.font_controller.increase_size()
-        messagebox.showinfo("Font Size", 
-                          f"Font size increased to {self.font_controller.base_size}")
+        # Update status label if available
+        if hasattr(self.app, 'status_label'):
+            self.app.status_label.config(text=f"● Font: {self.font_controller.base_size}pt")
     
     def decrease_font(self):
         """Decrease font size"""
         self.font_controller.decrease_size()
-        messagebox.showinfo("Font Size", 
-                          f"Font size decreased to {self.font_controller.base_size}")
+        # Update status label if available
+        if hasattr(self.app, 'status_label'):
+            self.app.status_label.config(text=f"● Font: {self.font_controller.base_size}pt")
     
     def show_about(self):
         """Show about dialog"""
@@ -374,9 +380,25 @@ Ctrl+D - Export Data
 
 View Menu:
 Ctrl+T - Toggle Theme
-Ctrl++ - Increase Font
-Ctrl+- - Decrease Font"""
+Ctrl+Plus - Increase Font
+Ctrl+Minus - Decrease Font
+Ctrl+0 - Reset Font"""
         messagebox.showinfo("Keyboard Shortcuts", shortcuts_text)
+    
+    def bind_shortcuts(self):
+        """Bind keyboard shortcuts to functions"""
+        # File operations
+        self.root.bind('<Control-q>', lambda e: self.app.safe_quit())
+        self.root.bind('<Control-e>', lambda e: self.export_png())
+        self.root.bind('<Control-E>', lambda e: self.export_pdf())  # Shift+E
+        self.root.bind('<Control-d>', lambda e: self.export_csv())
+        
+        # View operations
+        self.root.bind('<Control-t>', lambda e: self.theme_switcher.toggle_theme())
+        self.root.bind('<Control-plus>', lambda e: self.increase_font())
+        self.root.bind('<Control-equal>', lambda e: self.increase_font())  # For convenience (no shift needed)
+        self.root.bind('<Control-minus>', lambda e: self.decrease_font())
+        self.root.bind('<Control-0>', lambda e: self.font_controller.reset_size())
 
 
 import tkinter as tk
